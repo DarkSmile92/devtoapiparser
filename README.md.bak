@@ -6,7 +6,7 @@ Supporting the moderation of articles
 
 Planned enhancements to this project:
 
-- Database to save already checked posts
+- Database to safe already checked posts
 - Definition of severity for bad words
 - Global source for bad words
 - More detailed outputs
