@@ -10,6 +10,7 @@ Planned enhancements to this project:
 - Definition of severity for bad words
 - Global source for bad words
 - More detailed outputs
+- Check if articles have changed after initial check (saving content to db)
 - GUI (maybe later)
 
 ## Setup and usage
@@ -26,3 +27,10 @@ Then run it with `npm run start`.
 ## Note about the warnings
 
 Not all articles flagged as "need your attention" may be bad / contain unwanted content. For exmaple the phrase `#1` is quite common in good posts but also in bad posts. In the future there will be a severity for each phrase to prevent good posts with those phrases to pop up.
+
+## Changelog
+
+###### 07/2019
+
+- Initial creation
+- Add SQLite3 support for checked articles (node-sqlite3)

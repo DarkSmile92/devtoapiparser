@@ -4,8 +4,8 @@
   "description": "DEV.to api parser",
   "main": "index.js",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/DarkSmile92/devtoapiparser.git"
+    "type": "git",
+    "url": "https://github.com/DarkSmile92/devtoapiparser.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-xray-sdk": "^2.3.3",
-    "axios": "^0.19.0"
+    "axios": "^0.19.0",
+    "sqlite3": "https://github.com/mapbox/node-sqlite3/tarball/master"
   }
 }

@@ -1,8 +1,11 @@
 const axios = require("axios");
 const fs = require("fs");
+const sqlite3 = require("sqlite3").verbose();
+// To test, use: const db = new sqlite3.Database(":memory:");
+const db = new sqlite3.Database("checkedData.db");
 
 // PERSONAL CONFIG
-const APIKEY = ""; // get token from settings
+const APIKEY = "kEmMEzLEFHfMHTAWAtxYiKw8"; // get token from settings
 const MY_TAGS = ["productivity"];
 const ONLY_MY_TAGS = true;
 const SITES_TO_CHECK = 2;
@@ -86,7 +89,11 @@ const getArticlesPaged = async page => {
   }
 };
 
-const checkMyArticles = async pagesToCheck => {
+const checkMyArticles = async (
+  pagesToCheck,
+  checkedArticleIds,
+  db_insert_statement
+) => {
   for (let page = 0; page < pagesToCheck; page++) {
     const articles = await getArticlesPaged(page + 1);
 
@@ -97,10 +104,11 @@ const checkMyArticles = async pagesToCheck => {
       );
       // loop articles and check them
       for (const article of articles.data) {
-        await checkArticle(article);
+        await checkArticle(article, checkedArticleIds, db_insert_statement);
       }
     }
   }
+  db_insert_statement.finalize();
 };
 
 const getArticleDetails = async articleId => {
@@ -206,7 +214,11 @@ const processChecks = async articleItem => {
   return mustCheck;
 };
 
-const checkArticle = async article => {
+const checkArticle = async (
+  article,
+  checkedArticleIds,
+  db_insert_statement
+) => {
   const article_id = article.id;
   const article_title = article.title;
   const article_description = article.description;
@@ -223,6 +235,9 @@ const checkArticle = async article => {
 
   CONSOLE_NEED_SPLIT = true;
 
+  if (checkedArticleIds.indexOf(article_id) >= 0) {
+    return;
+  }
   if (ONLY_MY_TAGS) {
     // check if my tag is affected
     for (const tagname of MY_TAGS) {
@@ -237,6 +252,13 @@ const checkArticle = async article => {
             }) needs moderation from you due to the tag #${tagname}`
           );
           console.log(article_url);
+          // Save article to DB
+          db_insert_statement.run(
+            article_id,
+            article_url,
+            article_tags.join(", "),
+            article_user.username
+          );
         }
       }
     }
@@ -249,12 +271,63 @@ const checkArticle = async article => {
         })`
       );
       console.log(article_url);
+      // Save article to DB
+      db_insert_statement.run(
+        article_id,
+        article_url,
+        article_tags.join(", "),
+        article_user.username
+      );
     }
   }
 };
 
+const runWithDB = () => {
+  // Setup database and run code in DB context
+  db.serialize(function() {
+    db.run(
+      "CREATE TABLE IF NOT EXISTS CheckedArticles (article_id INTEGER PRIMARY KEY, article_url TEXT NOT NULL, article_tags TEXT NULL, article_author TEXT NOT NULL)"
+    );
+
+    const stmt = db.prepare("INSERT INTO CheckedArticles VALUES (?,?,?,?)");
+    const checkedArticleIds = [];
+    // select already checked articles to not check them again
+    db.each(
+      "SELECT rowid AS id, article_id FROM CheckedArticles",
+      function(err, row) {
+        if (checkedArticleIds.indexOf(row.article_id) < 0) {
+          checkedArticleIds.push(row.article_id);
+        }
+      },
+      () => {
+        if (checkedArticleIds.length > 0) {
+          console.log(
+            `Skipping ${checkedArticleIds.length} already checked articles.`
+          );
+        }
+
+        checkMyArticles(SITES_TO_CHECK, checkedArticleIds, stmt);
+      }
+    );
+    // finalize in check function because of async nature
+    // stmt.finalize();
+
+    // To test written data in DB:
+    /*
+    db.each(
+      "SELECT rowid AS id, article_id, article_url FROM CheckedArticles",
+      function(err, row) {
+        console.log(`${row.id}: ${row.article_id} -> ${row.article_url}`);
+      }
+    );
+    */
+  });
+
+  // db.close();
+};
+
 if (!APIKEY || APIKEY.length === 0 || APIKEY === "") {
-	console.error("No APIKEY configured! Please provide one in the file!");
+  console.error("No APIKEY configured! Please provide one in the file!");
 } else {
-	checkMyArticles(SITES_TO_CHECK);	
+  runWithDB();
 }
