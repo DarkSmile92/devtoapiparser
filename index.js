@@ -8,7 +8,7 @@ const db = new sqlite3.Database("checkedData.db");
 const APIKEY = "kEmMEzLEFHfMHTAWAtxYiKw8"; // get token from settings
 const MY_TAGS = ["productivity"];
 const ONLY_MY_TAGS = true;
-const SITES_TO_CHECK = 2;
+const SITES_TO_CHECK = 3;
 
 // BASE CONFIG
 const BASEURL = "https://dev.to/api";
@@ -45,7 +45,8 @@ const BADPHRASES = [
   "Fuck",
   "Abuse",
   "Shop",
-  "Needy"
+  "Needy",
+  "Plumber"
 ];
 let ADD_BAD_WORDS = [];
 // Load additional bad words
@@ -94,6 +95,7 @@ const checkMyArticles = async (
   checkedArticleIds,
   db_insert_statement
 ) => {
+	console.log(`Checking ${ONLY_MY_TAGS ? 'only my tags' : 'all articles'} on the latest ${pagesToCheck} pages.`);
   for (let page = 0; page < pagesToCheck; page++) {
     const articles = await getArticlesPaged(page + 1);
 
