@@ -42,6 +42,6 @@ Not all articles flagged as "need your attention" may be bad / contain unwanted 
 
   Changed minimal character count to spot short posts (potential to be promotional or of no value)
 
-  Added [Chalk](<[https://www.npmjs.com/package/chalk](https://www.npmjs.com/package/chalk)>) to style the outputs
+  Added [Chalk](https://www.npmjs.com/package/chalk](https://www.npmjs.com/package/chalk) to style the outputs
 
   Added check for very long / strange tags (longer than 20 chars, contains spaces)
