@@ -1,7 +1,4 @@
-const VERSION = "1.0.1";
 const axios = require("axios");
-const chalk = require("chalk");
-const log = console.log;
 const fs = require("fs");
 const sqlite3 = require("sqlite3").verbose();
 // To test, use: const db = new sqlite3.Database(":memory:");
@@ -51,8 +48,7 @@ const BADPHRASES = [
   "Needy",
   "Plumber",
   "Sale",
-  "Escort",
-  "Crypto"
+  "Escort"
 ];
 let ADD_BAD_WORDS = [];
 // Load additional bad words
@@ -64,11 +60,9 @@ fs.readFile("./badstrings.txt", "utf8", function(err, data) {
   // console.log(data);
 });
 let CONSOLE_NEED_SPLIT = false;
-const error = chalk.bold.red;
-const warning = chalk.keyword("orange");
 
 const printSplit = () => {
-  log(chalk.green.bold("---- :: ---- :: ----"));
+  console.log("---- :: ---- :: ----");
 };
 
 const countWords = s => {
@@ -94,7 +88,7 @@ const getArticlesPaged = async page => {
       headers: { "Content-Type": "application/json", "api-key": APIKEY }
     });
   } catch (error) {
-    log(error(error));
+    console.error(error);
   }
 };
 
@@ -103,16 +97,12 @@ const checkMyArticles = async (
   checkedArticleIds,
   db_insert_statement
 ) => {
-  log(
-    `Checking ${
-      ONLY_MY_TAGS ? "only my tags" : "all articles"
-    } on the latest ${pagesToCheck} pages.`
-  );
+	console.log(`Checking ${ONLY_MY_TAGS ? 'only my tags' : 'all articles'} on the latest ${pagesToCheck} pages.`);
   for (let page = 0; page < pagesToCheck; page++) {
     const articles = await getArticlesPaged(page + 1);
 
     if (articles.data) {
-      log(
+      console.log(
         `Got ${Object.entries(articles.data).length} articles at page ${page +
           1}`
       );
@@ -134,24 +124,22 @@ const getArticleDetails = async articleId => {
     });
   } catch (error) {
     // console.error(error);
-    log(error(error.response.status));
+    console.error(error.response.status);
     return null;
   }
 };
 
 const checkContentLength = content => {
-  const MIN_CHARS = 275;
+  const MIN_CHARS = 40;
   if (!content || content.length <= MIN_CHARS) {
     if (CONSOLE_NEED_SPLIT) {
       printSplit();
       CONSOLE_NEED_SPLIT = false;
     }
-    log(
-      warning(
-        `Article content too short: ${
-          content ? content.length : 0
-        } of required ${MIN_CHARS} chars. Should be checked.`
-      )
+    console.log(
+      `Article content too short: ${
+        content ? content.length : 0
+      } of required ${MIN_CHARS} chars.`
     );
     return true;
   }
@@ -170,10 +158,8 @@ const checkLinkWordRatio = content => {
       printSplit();
       CONSOLE_NEED_SPLIT = false;
     }
-    log(
-      waring(
-        `Link to word ratio too high: ${linkToWordRatio}/${MAX_LINK_PCT}. Words: ${numWords} Links: ${numLinks}`
-      )
+    console.log(
+      `Link to word ratio too high: ${linkToWordRatio}/${MAX_LINK_PCT}. Words: ${numWords} Links: ${numLinks}`
     );
     return true;
   }
@@ -200,7 +186,7 @@ const checkBadWords = content => {
       printSplit();
       CONSOLE_NEED_SPLIT = false;
     }
-    log(warning(`Found the following bad words: ${foundWords.join(", ")}`));
+    console.log(`Found the following bad words: ${foundWords.join(", ")}`);
     return true;
   }
   return false;
@@ -227,7 +213,7 @@ const processChecks = async articleItem => {
       printSplit();
       CONSOLE_NEED_SPLIT = false;
     }
-    log(error(`Could not get content of article ${articleItem.id}`));
+    console.log(`Could not get content of article ${articleItem.id}`);
   }
   return mustCheck;
 };
@@ -262,14 +248,14 @@ const checkArticle = async (
       if (article_tags.indexOf(tagname) >= 0) {
         const needAttention = await processChecks(article);
         if (needAttention) {
-          log(
+          console.log(
             `Post (${article_id}) "${article_title}" from "${
               article_user.name
             }" (${
               article_user.username
             }) needs moderation from you due to the tag #${tagname}`
           );
-          log(article_url);
+          console.log(article_url);
           // Save article to DB
           db_insert_statement.run(
             article_id,
@@ -283,12 +269,12 @@ const checkArticle = async (
   } else {
     const needAttention = await processChecks(article);
     if (needAttention) {
-      log(
+      console.log(
         `Post (${article_id}) "${article_title}" from "${article_user.name}" (${
           article_user.username
         })`
       );
-      log(article_url);
+      console.log(article_url);
       // Save article to DB
       db_insert_statement.run(
         article_id,
@@ -319,10 +305,8 @@ const runWithDB = () => {
       },
       () => {
         if (checkedArticleIds.length > 0) {
-          log(
-            chalk.magenta.bold(
-              `Skipping ${checkedArticleIds.length} already checked articles.`
-            )
+          console.log(
+            `Skipping ${checkedArticleIds.length} already checked articles.`
           );
         }
 
@@ -346,10 +330,8 @@ const runWithDB = () => {
   // db.close();
 };
 
-log(chalk.reset.cyan.bold(`DEV.to Moderator v${VERSION}`));
-
 if (!APIKEY || APIKEY.length === 0 || APIKEY === "") {
-  log(error("No APIKEY configured! Please provide one in the file!"));
+  console.error("No APIKEY configured! Please provide one in the file!");
 } else {
   runWithDB();
 }
