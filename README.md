@@ -44,4 +44,4 @@ Not all articles flagged as "need your attention" may be bad / contain unwanted 
 
   Added [Chalk](https://www.npmjs.com/package/chalk) to style the outputs
 
-  Added check for very long / strange tags (longer than 20 chars, contains spaces)
+  Added check for very long / strange tags (longer than 16 chars, contains spaces)

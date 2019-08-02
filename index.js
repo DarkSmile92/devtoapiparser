@@ -207,7 +207,7 @@ const checkBadWords = content => {
 };
 
 const checkStrangeTags = taglist => {
-  const CHAR_THRESHOLD = 20;
+  const CHAR_THRESHOLD = 17;
   let foundStrangeTags = false;
 
   for (const tag of taglist) {
