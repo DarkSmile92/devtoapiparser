@@ -32,5 +32,16 @@ Not all articles flagged as "need your attention" may be bad / contain unwanted 
 
 ###### 07/2019
 
-- Initial creation
-- Add SQLite3 support for checked articles (node-sqlite3)
+- V1.0.0
+
+  Add SQLite3 support for checked articles (node-sqlite3)
+
+- V1.0.1
+
+  Added Database for already processed articles
+
+  Changed minimal character count to spot short posts (potential to be promotional or of no value)
+
+  Added [Chalk](<[https://www.npmjs.com/package/chalk](https://www.npmjs.com/package/chalk)>) to style the outputs
+
+  Added check for very long / strange tags (longer than 20 chars, contains spaces)
