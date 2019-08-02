@@ -206,6 +206,19 @@ const checkBadWords = content => {
   return false;
 };
 
+const checkStrangeTags = taglist => {
+  const CHAR_THRESHOLD = 20;
+  let foundStrangeTags = false;
+
+  for (const tag of taglist) {
+    if (tag.trim().length >= CHAR_THRESHOLD || tag.trim().indexOf(" ") >= 0) {
+      log(warning(`The Tag ${tag.trim()} looks strange, please check it.`));
+      foundStrangeTags = true;
+    }
+  }
+  return foundStrangeTags;
+};
+
 const processChecks = async articleItem => {
   const articleDetails = await getArticleDetails(articleItem.id);
   if (!articleDetails) return false;
@@ -220,6 +233,9 @@ const processChecks = async articleItem => {
       mustCheck = true;
     }
     if (checkBadWords(details.body_html)) {
+      mustCheck = true;
+    }
+    if (checkStrangeTags(details.tag_list.split(","))) {
       mustCheck = true;
     }
   } else {
