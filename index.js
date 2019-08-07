@@ -11,7 +11,7 @@ const db = new sqlite3.Database("checkedData.db");
 const APIKEY = "kEmMEzLEFHfMHTAWAtxYiKw8"; // get token from settings
 const MY_TAGS = ["productivity"];
 const ONLY_MY_TAGS = false;
-const SITES_TO_CHECK = 3;
+const SITES_TO_CHECK = 6;
 
 // BASE CONFIG
 const BASEURL = "https://dev.to/api";
@@ -52,7 +52,8 @@ const BADPHRASES = [
   "Plumber",
   "Sale",
   "Escort",
-  "Crypto"
+  "Crypto",
+  "Exam"
 ];
 let ADD_BAD_WORDS = [];
 // Load additional bad words

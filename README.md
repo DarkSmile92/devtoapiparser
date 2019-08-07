@@ -28,6 +28,28 @@ Then run it with `npm run start`.
 
 Not all articles flagged as "need your attention" may be bad / contain unwanted content. For exmaple the phrase `#1` is quite common in good posts but also in bad posts. In the future there will be a severity for each phrase to prevent good posts with those phrases to pop up.
 
+## Install problems and solutions
+
+### Error EINTEGRITY on npm install
+
+The following or similar log could pop up when running `npm i`:
+
+```
+npm WARN tarball tarball data for sqlite3@https://github.com/mapbox/node-sqlite3/tarball/master (sha512-/YGQWMMiqHzl2+E8f6jcuaheEXXvwC3tSyBlH3ljvG+hD+7T04TXbGD6otrQfZ1igGeUU2rs6dGM1UPBTC33Wg==) seems to be corrupted. Trying one more time.
+npm WARN tarball tarball data for sqlite3@https://github.com/mapbox/node-sqlite3/tarball/master (sha512-/YGQWMMiqHzl2+E8f6jcuaheEXXvwC3tSyBlH3ljvG+hD+7T04TXbGD6otrQfZ1igGeUU2rs6dGM1UPBTC33Wg==) seems to be corrupted. Trying one more time.
+npm ERR! code EINTEGRITY
+npm ERR! Verification failed while extracting sqlite3@https://github.com/mapbox/node-sqlite3/tarball/master:
+npm ERR! Verification failed while extracting sqlite3@https://github.com/mapbox/node-sqlite3/tarball/master:
+npm ERR! sha512-/YGQWMMiqHzl2+E8f6jcuaheEXXvwC3tSyBlH3ljvG+hD+7T04TXbGD6otrQfZ1igGeUU2rs6dGM1UPBTC33Wg== integrity checksum failed when using sha512: wanted sha512-/YGQWMMiqHzl2+E8f6jcuaheEXXvwC3tSyBlH3ljvG+hD+7T04TXbGD6otrQfZ1igGeUU2rs6dGM1UPBTC3
+```
+
+**Solution:**
+
+```
+rm package-lock.json
+npm cache verify
+```
+
 ## Changelog
 
 ###### 07/2019
@@ -45,3 +67,5 @@ Not all articles flagged as "need your attention" may be bad / contain unwanted 
   Added [Chalk](https://www.npmjs.com/package/chalk) to style the outputs
 
   Added check for very long / strange tags (longer than 16 chars, contains spaces)
+
+  Added resolution for install problems with node-sqlite3 to Readme (thanks @chiangs)

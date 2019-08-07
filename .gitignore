@@ -99,3 +99,6 @@ typings/
 
 # ignore db files
 *.db
+
+# ignore .bak files
+*.bak
