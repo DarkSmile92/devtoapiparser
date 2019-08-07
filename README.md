@@ -69,3 +69,5 @@ npm cache verify
   Added check for very long / strange tags (longer than 16 chars, contains spaces)
 
   Added resolution for install problems with node-sqlite3 to Readme (thanks @chiangs)
+
+  Added PR and Issue templates
