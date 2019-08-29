@@ -71,3 +71,7 @@ npm cache verify
   Added resolution for install problems with node-sqlite3 to Readme (thanks @chiangs)
 
   Added PR and Issue templates
+
+- V1.0.2
+  
+  Added the newly introduced `state` parameter to the queries to check fresh articles.

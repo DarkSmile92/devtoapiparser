@@ -1,4 +1,4 @@
-const VERSION = "1.0.1";
+const VERSION = "1.0.2";
 const axios = require("axios");
 const chalk = require("chalk");
 const log = console.log;
@@ -12,6 +12,13 @@ const APIKEY = "kEmMEzLEFHfMHTAWAtxYiKw8"; // get token from settings
 const MY_TAGS = ["productivity"];
 const ONLY_MY_TAGS = false;
 const SITES_TO_CHECK = 6;
+/*
+state parameter combinations:
+state=fresh => checking newly published posts
+state=all & username=ben => must be used with username (also 1000 articles will be returned instead of the default 30)
+state=rising => will return published rising articles
+*/
+const CHECK_STATE = "fresh";
 
 // BASE CONFIG
 const BASEURL = "https://dev.to/api";
@@ -91,7 +98,7 @@ const getArticlesPaged = async page => {
   try {
     return await axios({
       method: "get",
-      url: `${BASEURL}/articles?page=${page}`,
+      url: `${BASEURL}/articles?page=${page}&state=${CHECK_STATE}`,
       headers: { "Content-Type": "application/json", "api-key": APIKEY }
     });
   } catch (error) {
