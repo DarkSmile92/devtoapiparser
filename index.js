@@ -98,7 +98,7 @@ const getArticlesPaged = async page => {
   try {
     return await axios({
       method: "get",
-      url: `${BASEURL}/articles?page=${page}&state=${CHECK_STATE}`,
+      url: `${BASEURL}/articles?page=${page}`,
       headers: { "Content-Type": "application/json", "api-key": APIKEY }
     });
   } catch (error) {
