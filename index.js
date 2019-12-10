@@ -106,6 +106,18 @@ const getArticlesPaged = async page => {
   }
 };
 
+const getFreshArticlesByTag = async tag => {
+  try {
+    return await axios({
+      method: "get",
+      url: `${BASEURL}/articles?state=fresh&tag=${tag}`,
+      headers: { "Content-Type": "application/json", "api-key": APIKEY }
+    });
+  } catch (error) {
+    log(error(error));
+  }
+};
+
 const checkMyArticles = async (
   pagesToCheck,
   checkedArticleIds,
@@ -126,6 +138,22 @@ const checkMyArticles = async (
       );
       // loop articles and check them
       for (const article of articles.data) {
+        await checkArticle(article, checkedArticleIds, db_insert_statement);
+      }
+    }
+  }
+  db_insert_statement.finalize();
+};
+
+const checkLatest = async (checkedArticleIds, db_insert_statement) => {
+  log(`Checking only my tags on the latest page.`);
+  // check if my tag is affected
+  for (const tagname of MY_TAGS) {
+    const articlesForTag = await getFreshArticlesByTag(tagname);
+    if (articlesForTag.data) {
+      log(`Got ${Object.entries(articlesForTag.data).length} articles for tag ${tagname}`);
+      // loop articles and check them
+      for (const article of articlesForTag.data) {
         await checkArticle(article, checkedArticleIds, db_insert_statement);
       }
     }
@@ -350,7 +378,8 @@ const runWithDB = () => {
           );
         }
 
-        checkMyArticles(SITES_TO_CHECK, checkedArticleIds, stmt);
+        //checkMyArticles(SITES_TO_CHECK, checkedArticleIds, stmt);
+        checkLatest(checkedArticleIds, stmt);
       }
     );
     // finalize in check function because of async nature
