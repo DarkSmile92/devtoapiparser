@@ -137,7 +137,7 @@ const checkLinkWordRatio = content => {
       CONSOLE_NEED_SPLIT = false;
     }
     log(
-      waring(
+      warning(
         `Link to word ratio too high: ${linkToWordRatio}/${MAX_LINK_PCT}. Words: ${numWords} Links: ${numLinks}`
       )
     );

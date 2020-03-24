@@ -9,7 +9,7 @@ const db = new sqlite3.Database("checkedData.db");
 
 // PERSONAL CONFIG
 const APIKEY = "kEmMEzLEFHfMHTAWAtxYiKw8"; // get token from settings
-const MY_TAGS = ["productivity"];
+const MY_TAGS = ["productivity", "news", "tooling"];
 const ONLY_MY_TAGS = false;
 const SITES_TO_CHECK = 6;
 /*
@@ -151,7 +151,11 @@ const checkLatest = async (checkedArticleIds, db_insert_statement) => {
   for (const tagname of MY_TAGS) {
     const articlesForTag = await getFreshArticlesByTag(tagname);
     if (articlesForTag.data) {
-      log(`Got ${Object.entries(articlesForTag.data).length} articles for tag ${tagname}`);
+      log(
+        `Got ${
+          Object.entries(articlesForTag.data).length
+        } articles for tag ${tagname}`
+      );
       // loop articles and check them
       for (const article of articlesForTag.data) {
         await checkArticle(article, checkedArticleIds, db_insert_statement);
@@ -207,7 +211,7 @@ const checkLinkWordRatio = content => {
       CONSOLE_NEED_SPLIT = false;
     }
     log(
-      waring(
+      warning(
         `Link to word ratio too high: ${linkToWordRatio}/${MAX_LINK_PCT}. Words: ${numWords} Links: ${numLinks}`
       )
     );
@@ -315,11 +319,7 @@ const checkArticle = async (
         const needAttention = await processChecks(article);
         if (needAttention) {
           log(
-            `Post (${article_id}) "${article_title}" from "${
-              article_user.name
-            }" (${
-              article_user.username
-            }) needs moderation from you due to the tag #${tagname}`
+            `Post (${article_id}) "${article_title}" from "${article_user.name}" (${article_user.username}) needs moderation from you due to the tag #${tagname}`
           );
           log(article_url);
           // Save article to DB
@@ -336,9 +336,7 @@ const checkArticle = async (
     const needAttention = await processChecks(article);
     if (needAttention) {
       log(
-        `Post (${article_id}) "${article_title}" from "${article_user.name}" (${
-          article_user.username
-        })`
+        `Post (${article_id}) "${article_title}" from "${article_user.name}" (${article_user.username})`
       );
       log(article_url);
       // Save article to DB
