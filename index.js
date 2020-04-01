@@ -32,6 +32,7 @@ const BADPHRASES = [
   "Credit card",
   "Freedom",
   "Double your",
+  "Essay",
   "Luxury",
   "Investment",
   "Obligation",
