@@ -9,7 +9,7 @@ const db = new sqlite3.Database("checkedData.db");
 
 // PERSONAL CONFIG
 const APIKEY = "kEmMEzLEFHfMHTAWAtxYiKw8"; // get token from settings
-const MY_TAGS = ["productivity", "news", "tooling"];
+const MY_TAGS = ["productivity", "news", "tooling", "opensource"];
 const ONLY_MY_TAGS = false;
 const SITES_TO_CHECK = 6;
 /*
