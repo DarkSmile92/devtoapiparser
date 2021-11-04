@@ -2,6 +2,7 @@ const VERSION = "1.0.2";
 const axios = require("axios");
 const chalk = require("chalk");
 const log = console.log;
+const logerror = console.error;
 const fs = require("fs");
 const sqlite3 = require("sqlite3").verbose();
 // To test, use: const db = new sqlite3.Database(":memory:");
@@ -61,11 +62,11 @@ const BADPHRASES = [
   "Sale",
   "Escort",
   "Crypto",
-  "Exam"
+  "Exam",
 ];
 let ADD_BAD_WORDS = [];
 // Load additional bad words
-fs.readFile("./badstrings.txt", "utf8", function(err, data) {
+fs.readFile("./badstrings.txt", "utf8", function (err, data) {
   if (err) throw err;
   if (data) {
     ADD_BAD_WORDS = [...data.split(",")];
@@ -80,42 +81,42 @@ const printSplit = () => {
   log(chalk.green.bold("---- :: ---- :: ----"));
 };
 
-const countWords = s => {
+const countWords = (s) => {
   s = s.replace(/(^\s*)|(\s*$)/gi, ""); //exclude  start and end white-space
   s = s.replace(/[ ]{2,}/gi, " "); //2 or more space to 1
   s = s.replace(/\n /, "\n"); // exclude newline with a start spacing
-  return s.split(" ").filter(function(str) {
+  return s.split(" ").filter(function (str) {
     return str != "";
   }).length;
   //return s.split(' ').filter(String).length; - this can also be used
 };
 
-const countLinks = content => {
+const countLinks = (content) => {
   const matches = content.match(/href/gi);
   return matches ? matches.length : 0;
 };
 
-const getArticlesPaged = async page => {
+const getArticlesPaged = async (page) => {
   try {
     return await axios({
       method: "get",
       url: `${BASEURL}/articles?page=${page}`,
-      headers: { "Content-Type": "application/json", "api-key": APIKEY }
+      headers: { "Content-Type": "application/json", "api-key": APIKEY },
     });
   } catch (error) {
-    log(error(error));
+    logerror(error);
   }
 };
 
-const getFreshArticlesByTag = async tag => {
+const getFreshArticlesByTag = async (tag) => {
   try {
     return await axios({
       method: "get",
       url: `${BASEURL}/articles?state=fresh&tag=${tag}`,
-      headers: { "Content-Type": "application/json", "api-key": APIKEY }
+      headers: { "Content-Type": "application/json", "api-key": APIKEY },
     });
   } catch (error) {
-    log(error(error));
+    logerror(error);
   }
 };
 
@@ -134,8 +135,9 @@ const checkMyArticles = async (
 
     if (articles.data) {
       log(
-        `Got ${Object.entries(articles.data).length} articles at page ${page +
-          1}`
+        `Got ${Object.entries(articles.data).length} articles at page ${
+          page + 1
+        }`
       );
       // loop articles and check them
       for (const article of articles.data) {
@@ -166,21 +168,21 @@ const checkLatest = async (checkedArticleIds, db_insert_statement) => {
   db_insert_statement.finalize();
 };
 
-const getArticleDetails = async articleId => {
+const getArticleDetails = async (articleId) => {
   try {
     return await axios({
       method: "get",
       url: `${BASEURL}/articles/${articleId}`,
-      headers: { "Content-Type": "application/json", "api-key": APIKEY }
+      headers: { "Content-Type": "application/json", "api-key": APIKEY },
     });
   } catch (error) {
-    // console.error(error);
-    log(error(error.response.status));
+    logerror(error);
+    logerror(error.response.status);
     return null;
   }
 };
 
-const checkContentLength = content => {
+const checkContentLength = (content) => {
   const MIN_CHARS = 275;
   if (!content || content.length <= MIN_CHARS) {
     if (CONSOLE_NEED_SPLIT) {
@@ -199,7 +201,7 @@ const checkContentLength = content => {
   return false;
 };
 
-const checkLinkWordRatio = content => {
+const checkLinkWordRatio = (content) => {
   const MAX_LINK_PCT = 20;
   const numWords = countWords(content);
   const numLinks = countLinks(content);
@@ -221,16 +223,18 @@ const checkLinkWordRatio = content => {
   return false;
 };
 
-const checkBadWords = content => {
+const checkBadWords = (content) => {
   const lwrContent = content.toLowerCase();
   let foundWords = [];
-  for (const badword of BADPHRASES) {
+  for (let badword of BADPHRASES) {
+    badword = badword.trim();
     if (badword.length > 0 && lwrContent.indexOf(badword.toLowerCase()) >= 0) {
       // console.log(`BW: ${badword}`);
       foundWords.push(badword);
     }
   }
-  for (const badword of ADD_BAD_WORDS) {
+  for (let badword of ADD_BAD_WORDS) {
+    badword = badword.trim();
     if (badword.length > 0 && lwrContent.indexOf(badword.toLowerCase()) >= 0) {
       // console.log(`BW: ${badword}`);
       foundWords.push(badword);
@@ -247,7 +251,7 @@ const checkBadWords = content => {
   return false;
 };
 
-const checkStrangeTags = taglist => {
+const checkStrangeTags = (taglist) => {
   const CHAR_THRESHOLD = 17;
   let foundStrangeTags = false;
 
@@ -260,7 +264,7 @@ const checkStrangeTags = taglist => {
   return foundStrangeTags;
 };
 
-const processChecks = async articleItem => {
+const processChecks = async (articleItem) => {
   const articleDetails = await getArticleDetails(articleItem.id);
   if (!articleDetails) return false;
   const details = articleDetails.data;
@@ -284,7 +288,7 @@ const processChecks = async articleItem => {
       printSplit();
       CONSOLE_NEED_SPLIT = false;
     }
-    log(error(`Could not get content of article ${articleItem.id}`));
+    logerror(`Could not get content of article ${articleItem.id}`);
   }
   return mustCheck;
 };
@@ -353,7 +357,7 @@ const checkArticle = async (
 
 const runWithDB = () => {
   // Setup database and run code in DB context
-  db.serialize(function() {
+  db.serialize(function () {
     db.run(
       "CREATE TABLE IF NOT EXISTS CheckedArticles (article_id INTEGER PRIMARY KEY, article_url TEXT NOT NULL, article_tags TEXT NULL, article_author TEXT NOT NULL)"
     );
@@ -363,7 +367,7 @@ const runWithDB = () => {
     // select already checked articles to not check them again
     db.each(
       "SELECT rowid AS id, article_id FROM CheckedArticles",
-      function(err, row) {
+      function (err, row) {
         if (checkedArticleIds.indexOf(row.article_id) < 0) {
           checkedArticleIds.push(row.article_id);
         }
@@ -401,7 +405,7 @@ const runWithDB = () => {
 log(chalk.reset.cyan.bold(`DEV.to Moderator v${VERSION}`));
 
 if (!APIKEY || APIKEY.length === 0 || APIKEY === "") {
-  log(error("No APIKEY configured! Please provide one in the file!"));
+  logerror("No APIKEY configured! Please provide one in the file!");
 } else {
   runWithDB();
 }
